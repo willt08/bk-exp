@@ -40,9 +40,7 @@ class CrewAmpClient:
         except httpx.TimeoutException as error:
             raise CrewAmpError("CrewAI AMP request timed out after 30 seconds.") from error
         except httpx.HTTPStatusError as error:
-            raise CrewAmpError(
-                f"CrewAI AMP returned HTTP {error.response.status_code} for {path}."
-            ) from error
+            raise CrewAmpError(self._http_error_message(error.response, path)) from error
         except httpx.RequestError as error:
             raise CrewAmpError("Unable to reach the configured CrewAI AMP endpoint.") from error
         return self._json_object(response, path)
@@ -55,9 +53,7 @@ class CrewAmpClient:
         except httpx.TimeoutException as error:
             raise CrewAmpError("CrewAI AMP request timed out after 30 seconds.") from error
         except httpx.HTTPStatusError as error:
-            raise CrewAmpError(
-                f"CrewAI AMP returned HTTP {error.response.status_code} for {path}."
-            ) from error
+            raise CrewAmpError(self._http_error_message(error.response, path)) from error
         except httpx.RequestError as error:
             raise CrewAmpError("Unable to reach the configured CrewAI AMP endpoint.") from error
         return self._json_object(response, path)
@@ -71,3 +67,17 @@ class CrewAmpClient:
         if not isinstance(payload, dict):
             raise CrewAmpError(f"CrewAI AMP returned a non-object JSON response for {endpoint}.")
         return payload
+
+    @staticmethod
+    def _http_error_message(response: httpx.Response, endpoint: str) -> str:
+        message = f"CrewAI AMP returned HTTP {response.status_code} for {endpoint}."
+        if response.status_code != 422:
+            return message
+        try:
+            payload = response.json()
+        except ValueError:
+            return message
+        detail = payload.get("detail") if isinstance(payload, dict) else None
+        if isinstance(detail, str) and detail.strip():
+            return f"{message} Validation detail: {detail.strip()}"
+        return message

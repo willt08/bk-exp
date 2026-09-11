@@ -10,6 +10,7 @@ const offersElement = document.querySelector("#offers");
 const routeStopsElement = document.querySelector("#route-stops");
 const researchResultsElement = document.querySelector("#research-results");
 const crewResultElement = document.querySelector("#crew-result");
+const mapRouteName = document.querySelector("#map-route-name");
 const map = new maplibregl.Map({
   container: "map",
   style: "https://tiles.openfreemap.org/styles/liberty",
@@ -59,7 +60,8 @@ function showRouteStops(points) {
   routeStopsElement.replaceChildren();
   const totalMinutes = points.reduce((total, point) => total + point.estimated_minutes, 0);
   const summary = document.createElement("p");
-  summary.textContent = `${points.length} stops · about ${totalMinutes} minutes at the sites`;
+  summary.className = "empty-state";
+  summary.textContent = `${points.length} curated stops · about ${totalMinutes} minutes on site`;
   routeStopsElement.append(summary);
   points.forEach((point, index) => {
     const stop = document.createElement("article");
@@ -87,6 +89,7 @@ async function loadTour() {
   const response = await fetch(`/api/tours/${activeCharacter}`);
   if (!response.ok) throw new Error("The selected route could not be loaded.");
   const tour = await response.json();
+  mapRouteName.textContent = `${document.querySelector("#character").selectedOptions[0].text} route`;
   showPoints(tour.all_points);
   showRouteStops(tour.primary_route);
   map.once("load", () => setRoute(tour.primary_route));

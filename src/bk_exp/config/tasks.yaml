@@ -1,7 +1,7 @@
 verify_research:
   description: >
-    Inspect these You.com research citations for a {{ character }} Brooklyn tour:
-    {{ research_citations }}.
+    Inspect these You.com research citations for a {character} Brooklyn tour:
+    {research_citations}.
 
     State exactly what each citation supports, reject citations that are
     incomplete or do not directly support a cultural-tour claim, and retain
@@ -13,8 +13,8 @@ verify_research:
 
 curate_evidence:
   description: >
-    Review these You.com research citations for a {{ character }} Brooklyn tour:
-    {{ research_citations }}.
+    Review these You.com research citations for a {character} Brooklyn tour:
+    {research_citations}.
 
     Retain only claims directly supported by a supplied citation. For each
     retained citation, state its title, URL, supported cultural connection, and
@@ -27,8 +27,8 @@ curate_evidence:
 design_tour:
   description: >
     Using the verified evidence from the cultural curator, design a
-    {{ character }} Brooklyn walking-tour recommendation within
-    {{ remaining_minutes }} minutes and a ${{ remaining_budget_usd }} budget.
+    {character} Brooklyn walking-tour recommendation within
+    {remaining_minutes} minutes and a ${remaining_budget_usd} budget.
 
     Present stops in a sensible narrative order. For every stop, cite its
     source URL, estimate only time or cost that follows from the supplied
@@ -41,8 +41,8 @@ design_tour:
 evaluate_adaptation:
   description: >
     Evaluate the proposed itinerary against the visitor's remaining
-    {{ remaining_minutes }} minutes and ${{ remaining_budget_usd }} budget.
-    Preserve the primary {{ character }} narrative and identify only
+    {remaining_minutes} minutes and ${remaining_budget_usd} budget.
+    Preserve the primary {character} narrative and identify only
     evidence-backed changes that still fit those constraints.
   expected_output: >
     A final visitor-ready recommendation that confirms constraint compliance,

@@ -8,38 +8,74 @@
     <link href="/static/styles.css" rel="stylesheet">
   </head>
   <body>
-    <aside>
-      <p class="eyebrow">BK-EXP</p>
-      <h1>Walk Brooklyn stories.</h1>
-      <p id="status" role="status">Choose a character to start a live route.</p>
-      <label for="character">Your tour character</label>
-      <select id="character">
-        <option value="basquiat">Jean-Michel Basquiat</option>
-        <option value="whitman">Walt Whitman</option>
-        <option value="biggie">The Notorious B.I.G.</option>
-        <option value="rbg">Ruth Bader Ginsburg</option>
-      </select>
-      <button id="start-tour">Start tour</button>
-      <button id="research-tour" class="secondary">Refresh live research</button>
-      <button id="run-crew" class="secondary">Run 4-agent route review</button>
-      <section aria-labelledby="route-heading">
-        <h2 id="route-heading">Your route</h2>
-        <div id="route-stops"><p>Your ordered stops will appear here.</p></div>
+    <aside class="sidebar">
+      <header class="brand">
+        <p class="eyebrow">BK-EXP <span>Brooklyn, NY</span></p>
+        <h1>Stories worth walking.</h1>
+        <p class="intro">A thoughtful, source-backed tour that adapts around you.</p>
+      </header>
+
+      <section class="tour-picker" aria-labelledby="tour-picker-heading">
+        <div class="section-label">
+          <span class="step">01</span>
+          <h2 id="tour-picker-heading">Choose a story</h2>
+        </div>
+        <label for="character">Featured voice</label>
+        <select id="character">
+          <option value="basquiat">Jean-Michel Basquiat</option>
+          <option value="whitman">Walt Whitman</option>
+          <option value="biggie">The Notorious B.I.G.</option>
+          <option value="rbg">Ruth Bader Ginsburg</option>
+        </select>
+        <button id="start-tour"><span>Build my walk</span><span aria-hidden="true">→</span></button>
+        <p id="status" class="status" role="status">Choose a character to start a live route.</p>
       </section>
-      <section aria-labelledby="offers-heading">
-        <h2 id="offers-heading">Nearby crossovers</h2>
-        <div id="offers"><p>Location updates will surface fitting detours.</p></div>
+
+      <section class="panel route-panel" aria-labelledby="route-heading">
+        <div class="section-label">
+          <span class="step">02</span>
+          <h2 id="route-heading">Your route</h2>
+        </div>
+        <div id="route-stops"><p class="empty-state">Your ordered stops will appear here.</p></div>
       </section>
-      <section aria-labelledby="research-heading">
-        <h2 id="research-heading">Live research</h2>
-        <div id="research-results"><p>Live You.com findings will be labeled for curator review.</p></div>
+
+      <section class="panel" aria-labelledby="offers-heading">
+        <div class="section-label">
+          <span class="step">Live</span>
+          <h2 id="offers-heading">Nearby discoveries</h2>
+        </div>
+        <div id="offers"><p class="empty-state">Location updates will surface fitting detours.</p></div>
       </section>
-      <section aria-labelledby="crew-heading">
-        <h2 id="crew-heading">Agent review</h2>
-        <div id="crew-result"><p>Run the crew to research, curate, design, and evaluate.</p></div>
-      </section>
+
+      <details class="utility-panel">
+        <summary>Research &amp; agent review <span aria-hidden="true">+</span></summary>
+        <div class="utility-actions">
+          <button id="research-tour" class="secondary">Refresh live research</button>
+          <button id="run-crew" class="secondary">Run 4-agent route review</button>
+        </div>
+        <section aria-labelledby="research-heading">
+          <h2 id="research-heading" class="visually-hidden">Live research</h2>
+          <div id="research-results"><p class="empty-state">Live findings will be labeled for curator review.</p></div>
+        </section>
+        <section aria-labelledby="crew-heading">
+          <h2 id="crew-heading" class="visually-hidden">Agent review</h2>
+          <div id="crew-result"><p class="empty-state">Run the crew to research, curate, design, and evaluate.</p></div>
+        </section>
+      </details>
     </aside>
-    <main id="map" aria-label="Interactive Brooklyn tour map"></main>
+    <main class="map-shell">
+      <div id="map" aria-label="Interactive Brooklyn tour map"></div>
+      <div class="map-heading" aria-live="polite">
+        <p class="eyebrow">Live field guide</p>
+        <p id="map-route-name">Brooklyn cultural routes</p>
+      </div>
+      <div class="map-key" aria-label="Map legend">
+        <span class="key-dot"></span>
+        <span>Curated stop</span>
+        <span class="key-line"></span>
+        <span>Walking route</span>
+      </div>
+    </main>
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script src="/static/app.js"></script>
   </body>
