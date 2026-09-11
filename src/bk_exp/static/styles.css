@@ -12,7 +12,12 @@ select, button { width: 100%; min-height: 2.8rem; border-radius: .4rem; padding:
 select { border: 1px solid #555965; background: #111217; color: inherit; }
 button { border: 0; margin-top: .75rem; background: #f0bf5f; color: #1d1b17; cursor: pointer; font-weight: 800; }
 button.secondary { background: transparent; border: 1px solid #767987; color: #f6f1e8; margin-top: .4rem; }
-.offer { border-top: 1px solid #424550; margin-top: 1rem; padding-top: 1rem; }
+.offer, .research-citation { border-top: 1px solid #424550; margin-top: 1rem; padding-top: 1rem; }
 .offer p { color: #cdd0d7; font-size: .9rem; line-height: 1.4; }
+.research-citation p { color: #cdd0d7; font-size: .9rem; line-height: 1.4; }
+.research-citation a { color: #f0bf5f; font-size: .85rem; }
+.stop { border-top: 1px solid #424550; display: grid; gap: .25rem; margin-top: .75rem; padding-top: .75rem; }
+.stop-number { color: #f0bf5f; font-size: .8rem; font-weight: 800; letter-spacing: .08em; }
+.stop a { color: #f0bf5f; font-size: .85rem; }
 .avatar { width: 48px; height: 48px; filter: drop-shadow(0 2px 5px #0008); }
 @media (max-width: 720px) { body { grid-template-columns: 1fr; grid-template-rows: auto 60vh; } aside { padding: 1.25rem; } main { min-height: 60vh; } }

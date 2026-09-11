@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 import httpx
 
@@ -12,7 +13,7 @@ class YouSearchClient:
     api_key: str
     base_url: str
 
-    async def search(self, query: str) -> dict:
+    async def search(self, query: str) -> dict[str, Any]:
         headers = {"X-API-Key": self.api_key}
         try:
             async with httpx.AsyncClient(timeout=httpx.Timeout(15.0)) as client:

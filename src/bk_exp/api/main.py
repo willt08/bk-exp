@@ -7,10 +7,24 @@ from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-from bk_exp.agents.crew import build_tour_crew
+from bk_exp.agents.crew import CrewAmpClient, CrewAmpError
 from bk_exp.clients.one import OneAuthError, OneOAuthClient
-from bk_exp.models import CrossoverRequest, CrossoverResponse, FeedbackRequest, FeedbackResponse, TourCharacter, TourResponse
+from bk_exp.clients.you import YouSearchClient, YouSearchError
+from bk_exp.models import (
+    CrewRunRequest,
+    CrewRunResponse,
+    CrewInputsResponse,
+    CrewStatusResponse,
+    CrossoverRequest,
+    CrossoverResponse,
+    FeedbackRequest,
+    FeedbackResponse,
+    ResearchResponse,
+    TourCharacter,
+    TourResponse,
+)
 from bk_exp.settings import Settings
+from bk_exp.services.research import research_character
 from bk_exp.services.tours import POINTS_OF_INTEREST, PreferenceStore, crossover_offers
 
 static_directory = Path(__file__).parents[1] / "static"
@@ -39,6 +53,20 @@ def tour(character: TourCharacter) -> TourResponse:
     return TourResponse(character=character, primary_route=primary_route, all_points=POINTS_OF_INTEREST)
 
 
+@app.get("/api/research/{character}", response_model=ResearchResponse)
+async def research(character: TourCharacter) -> ResearchResponse:
+    if not settings.you_api_key or not settings.you_search_url:
+        raise HTTPException(
+            status_code=503,
+            detail="Live research needs YOU_API_KEY and YOU_SEARCH_URL.",
+        )
+    client = YouSearchClient(api_key=settings.you_api_key, base_url=settings.you_search_url)
+    try:
+        return await research_character(client, character)
+    except YouSearchError as error:
+        raise HTTPException(status_code=502, detail=str(error)) from error
+
+
 @app.post("/api/crossovers/evaluate", response_model=CrossoverResponse)
 def evaluate_crossovers(request: CrossoverRequest) -> CrossoverResponse:
     return CrossoverResponse(offers=crossover_offers(request, preferences))
@@ -49,10 +77,64 @@ def record_feedback(request: FeedbackRequest) -> FeedbackResponse:
     return preferences.record(request)
 
 
-@app.get("/api/crew/manifest")
-def crew_manifest() -> dict[str, list[str]]:
-    crew = build_tour_crew()
-    return {"agents": [agent.role for agent in crew.agents]}
+def configured_crew_client() -> CrewAmpClient:
+    if not settings.crew_is_configured():
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "CrewAI AMP needs YOU_API_KEY, YOU_SEARCH_URL, CREW_AMP_URL, and "
+                "CREW_AMP_BEARER_TOKEN."
+            ),
+        )
+    return CrewAmpClient(settings.crew_amp_url, settings.crew_amp_bearer_token)
+
+
+@app.get("/api/crew/inputs", response_model=CrewInputsResponse)
+async def crew_inputs() -> CrewInputsResponse:
+    try:
+        return CrewInputsResponse(inputs=(await configured_crew_client().inputs()))
+    except CrewAmpError as error:
+        raise HTTPException(status_code=502, detail=str(error)) from error
+
+
+@app.post("/api/crew/run", response_model=CrewRunResponse)
+async def run_crew(request: CrewRunRequest) -> CrewRunResponse:
+    crew_client = configured_crew_client()
+    research_client = YouSearchClient(api_key=settings.you_api_key, base_url=settings.you_search_url)
+    try:
+        research = await research_character(research_client, request.character)
+    except YouSearchError as error:
+        raise HTTPException(status_code=502, detail=str(error)) from error
+    if not research.citations:
+        raise HTTPException(
+            status_code=422,
+            detail="You.com returned no complete, unique citations for curator review.",
+        )
+    try:
+        response = await crew_client.kickoff(
+            {
+                **request.model_dump(),
+                "research_citations": [citation.model_dump() for citation in research.citations],
+            }
+        )
+    except CrewAmpError as error:
+        raise HTTPException(status_code=502, detail=str(error)) from error
+    kickoff_id = response.get("kickoff_id")
+    if not isinstance(kickoff_id, str) or not kickoff_id:
+        raise HTTPException(status_code=502, detail="CrewAI AMP kickoff response did not include kickoff_id.")
+    return CrewRunResponse(kickoff_id=kickoff_id, research=research)
+
+
+@app.get("/api/crew/runs/{kickoff_id}", response_model=CrewStatusResponse)
+async def crew_status(kickoff_id: str) -> CrewStatusResponse:
+    try:
+        response = await configured_crew_client().status(kickoff_id)
+    except CrewAmpError as error:
+        raise HTTPException(status_code=502, detail=str(error)) from error
+    status = response.get("status")
+    if not isinstance(status, str) or not status:
+        raise HTTPException(status_code=502, detail="CrewAI AMP status response did not include status.")
+    return CrewStatusResponse(kickoff_id=kickoff_id, status=status, result=response.get("result"))
 
 
 def configured_one_client() -> OneOAuthClient:

@@ -1,58 +1,73 @@
-from crewai import Agent, Crew, Process, Task
+"""CrewAI AMP REST integration for the deployed BK-EXP crew."""
+
+from dataclasses import dataclass
+from typing import Any
+from urllib.parse import urljoin
+
+import httpx
 
 
-def build_tour_crew() -> Crew:
-    researcher = Agent(
-        role="Brooklyn cultural research agent",
-        goal="Find current, cited public-web evidence for culturally relevant Brooklyn places.",
-        backstory="You use You.com Search for discovery and retain citations for every candidate.",
-        verbose=False,
-    )
-    curator = Agent(
-        role="Clean-data cultural curator",
-        goal="Normalize evidence-backed POIs and reject ambiguous or uncited claims.",
-        backstory="You protect historical accuracy, provenance, and geographic data quality.",
-        verbose=False,
-    )
-    route_designer = Agent(
-        role="Accessible route designer",
-        goal="Build a coherent character-led Brooklyn itinerary within time and budget constraints.",
-        backstory="You preserve the visitor's primary narrative while making travel impacts explicit.",
-        verbose=False,
-    )
-    adaptation_evaluator = Agent(
-        role="Learning crossover evaluator",
-        goal="Offer only useful nearby crossover opportunities and learn from explicit feedback.",
-        backstory="You never replace a chosen route without the visitor's consent.",
-        verbose=False,
-    )
+class CrewAmpError(RuntimeError):
+    """An actionable failure returned by the deployed CrewAI AMP service."""
 
-    research = Task(
-        description="Research cited Brooklyn points of interest for the selected cultural figure.",
-        expected_output="A list of source-attributed candidate POIs.",
-        agent=researcher,
-    )
-    curate = Task(
-        description="Validate research candidates and return clean, normalized POIs.",
-        expected_output="A provenance-preserving clean POI collection.",
-        agent=curator,
-        context=[research],
-    )
-    design = Task(
-        description="Design the primary walking route within the visitor's constraints.",
-        expected_output="An ordered primary route with time and budget impact.",
-        agent=route_designer,
-        context=[curate],
-    )
-    evaluate = Task(
-        description="Rank nearby crossovers using constraints and explicit feedback preferences.",
-        expected_output="Crossover offers that retain a resumable original route.",
-        agent=adaptation_evaluator,
-        context=[design],
-    )
-    return Crew(
-        agents=[researcher, curator, route_designer, adaptation_evaluator],
-        tasks=[research, curate, design, evaluate],
-        process=Process.sequential,
-        verbose=False,
-    )
+
+@dataclass(frozen=True)
+class CrewAmpClient:
+    base_url: str
+    bearer_token: str
+
+    def _url(self, path: str) -> str:
+        return urljoin(f"{self.base_url.rstrip('/')}/", path.lstrip("/"))
+
+    @property
+    def _headers(self) -> dict[str, str]:
+        return {"Authorization": f"Bearer {self.bearer_token}"}
+
+    async def inputs(self) -> dict[str, Any]:
+        return await self._get("inputs")
+
+    async def kickoff(self, inputs: dict[str, Any]) -> dict[str, Any]:
+        return await self._post("kickoff", {"inputs": inputs})
+
+    async def status(self, kickoff_id: str) -> dict[str, Any]:
+        return await self._get(f"status/{kickoff_id}")
+
+    async def _get(self, path: str) -> dict[str, Any]:
+        try:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
+                response = await client.get(self._url(path), headers=self._headers)
+                response.raise_for_status()
+        except httpx.TimeoutException as error:
+            raise CrewAmpError("CrewAI AMP request timed out after 30 seconds.") from error
+        except httpx.HTTPStatusError as error:
+            raise CrewAmpError(
+                f"CrewAI AMP returned HTTP {error.response.status_code} for {path}."
+            ) from error
+        except httpx.RequestError as error:
+            raise CrewAmpError("Unable to reach the configured CrewAI AMP endpoint.") from error
+        return self._json_object(response, path)
+
+    async def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
+        try:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
+                response = await client.post(self._url(path), headers=self._headers, json=payload)
+                response.raise_for_status()
+        except httpx.TimeoutException as error:
+            raise CrewAmpError("CrewAI AMP request timed out after 30 seconds.") from error
+        except httpx.HTTPStatusError as error:
+            raise CrewAmpError(
+                f"CrewAI AMP returned HTTP {error.response.status_code} for {path}."
+            ) from error
+        except httpx.RequestError as error:
+            raise CrewAmpError("Unable to reach the configured CrewAI AMP endpoint.") from error
+        return self._json_object(response, path)
+
+    @staticmethod
+    def _json_object(response: httpx.Response, endpoint: str) -> dict[str, Any]:
+        try:
+            payload = response.json()
+        except ValueError as error:
+            raise CrewAmpError(f"CrewAI AMP returned invalid JSON for {endpoint}.") from error
+        if not isinstance(payload, dict):
+            raise CrewAmpError(f"CrewAI AMP returned a non-object JSON response for {endpoint}.")
+        return payload

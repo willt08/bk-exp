@@ -183,8 +183,9 @@ docker run --rm -p 8000:8000 --env-file .env bk-exp
 | Variable | Purpose |
 |---|---|
 | `YOU_API_KEY` | Authenticates server-side You.com API requests. |
+| `YOU_SEARCH_URL` | The approved You.com Search endpoint URL for the team’s API plan. |
 | `DAYTONA_API_KEY` | Creates isolated CrewAI execution sandboxes. |
-| `LLM_API_KEY` | Supplies the CrewAI model provider credential. |
+| `OPENAI_API_KEY` | Supplies the CrewAI model provider credential. |
 | `ONE_CLIENT_ID` | Identifies BK-EXP to One. |
 | `ONE_CLIENT_SECRET` | Server-only One OAuth client secret. |
 | `ONE_REDIRECT_URI` | Registered One OAuth callback URL. |
@@ -192,6 +193,27 @@ docker run --rm -p 8000:8000 --env-file .env bk-exp
 
 One endpoint names and scopes must be copied from the team’s approved One
 developer configuration; this project does not guess or hard-code them.
+
+### Crew execution
+
+`GET /api/crew/inputs` discovers the required inputs from the deployed CrewAI
+AMP crew. `POST /api/crew/run` starts a remote execution with `character`,
+`remaining_minutes`, `remaining_budget_usd`, and live research citations; it
+returns a `kickoff_id`. The browser polls `GET /api/crew/runs/{kickoff_id}`
+until the deployed crew returns a terminal status. This requires `YOU_API_KEY`,
+`YOU_SEARCH_URL`, `CREW_AMP_URL`, and `CREW_AMP_BEARER_TOKEN`.
+Before invoking the LLM crew, the endpoint performs a required server-side
+You.com retrieval and refuses the run if that retrieval does not yield complete,
+unique citations. The resulting evidence is included in the crew inputs; the
+research task additionally requires the research agent to use its You.com tool
+to broaden or verify that evidence.
+
+The web application exposes both operations: **Refresh live research** calls
+`GET /api/research/{character}` and renders cited discovery findings in a
+curator-review panel, while **Run 4-agent route review** calls
+`POST /api/crew/run`. Search results never replace the vetted route
+automatically; a curator must review the evidence and geospatial data before a
+candidate is promoted into navigable route data.
 
 ## CI/CD
 
