@@ -124,7 +124,10 @@ bk-exp/
 ├── docs/                          # Architecture decisions, demo assets, runbooks
 ├── ontology/tour-navigation.owl   # Route, POI, provenance, and feedback vocabulary
 ├── src/
-│   ├── api/                       # FastAPI endpoints and One session boundary
+│   ├── bk_exp/
+│   │   ├── api/                   # FastAPI endpoints and One session boundary
+│   │   ├── config/                # CrewAI agent and task definitions
+│   │   └── crew.py                # CrewAI-hosted crew entry point
 │   ├── agents/                    # CrewAI agent/task definitions
 │   ├── clients/                   # You.com, One, Daytona, routing adapters
 │   ├── domain/                    # Typed tour, POI, feedback, and route models
@@ -135,6 +138,7 @@ bk-exp/
 ├── .env.example
 ├── .gitignore
 ├── pyproject.toml
+├── uv.lock
 └── README.md
 ```
 
@@ -176,6 +180,28 @@ database repository before deployment.
 ```powershell
 docker build -t bk-exp .
 docker run --rm -p 8000:8000 --env-file .env bk-exp
+```
+
+### CrewAI-hosted deployment
+
+The repository includes the standard CrewAI deployment entry point at
+`src/bk_exp/crew.py`, with its agent and task definitions in
+`src/bk_exp/config/`. The dependency graph is pinned in `uv.lock`.
+
+In the CrewAI deployment environment, configure these values as platform
+secrets rather than committing an `.env` file:
+
+- `OPENAI_API_KEY` for the CrewAI agents' LLM;
+- `YOU_API_KEY` and `YOU_SEARCH_URL` for the API's source-attributed
+  research workflow; and
+- `CREW_AMP_URL` and `CREW_AMP_BEARER_TOKEN` only when a separately hosted
+  FastAPI instance needs to call the deployed crew.
+
+From a local checkout, validate the same deployable environment with:
+
+```powershell
+uv sync --all-groups
+uv run pytest
 ```
 
 ### Required environment variables

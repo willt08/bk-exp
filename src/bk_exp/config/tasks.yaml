@@ -1,0 +1,50 @@
+verify_research:
+  description: >
+    Inspect these You.com research citations for a {{ character }} Brooklyn tour:
+    {{ research_citations }}.
+
+    State exactly what each citation supports, reject citations that are
+    incomplete or do not directly support a cultural-tour claim, and retain
+    each usable source URL. Do not add facts from outside the supplied
+    citations.
+  expected_output: >
+    A source-attributed evidence assessment listing usable citations, supported
+    claims, and citations requiring curator review.
+
+curate_evidence:
+  description: >
+    Review these You.com research citations for a {{ character }} Brooklyn tour:
+    {{ research_citations }}.
+
+    Retain only claims directly supported by a supplied citation. For each
+    retained citation, state its title, URL, supported cultural connection, and
+    any uncertainty that requires visitor verification. Do not use knowledge
+    outside the supplied citations.
+  expected_output: >
+    A concise, source-attributed list of defensible tour-stop evidence and a
+    separate list of claims that require verification.
+
+design_tour:
+  description: >
+    Using the verified evidence from the cultural curator, design a
+    {{ character }} Brooklyn walking-tour recommendation within
+    {{ remaining_minutes }} minutes and a ${{ remaining_budget_usd }} budget.
+
+    Present stops in a sensible narrative order. For every stop, cite its
+    source URL, estimate only time or cost that follows from the supplied
+    evidence, and label all unverified logistics. Preserve the visitor's
+    constraints instead of proposing an over-budget route.
+  expected_output: >
+    A visitor-ready, evidence-backed itinerary with ordered stops, source URLs,
+    total estimated time and cost, and clear verification notes.
+
+evaluate_adaptation:
+  description: >
+    Evaluate the proposed itinerary against the visitor's remaining
+    {{ remaining_minutes }} minutes and ${{ remaining_budget_usd }} budget.
+    Preserve the primary {{ character }} narrative and identify only
+    evidence-backed changes that still fit those constraints.
+  expected_output: >
+    A final visitor-ready recommendation that confirms constraint compliance,
+    preserves the primary route, and clearly marks any optional crossover or
+    verification requirement.
