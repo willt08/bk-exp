@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate-bootstrap:
+    name: Validate project scaffold
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate OWL/XML syntax
+        run: python -c "import xml.etree.ElementTree as ET; ET.parse('ontology/tour-navigation.owl')"
+
+      - name: Verify required bootstrap artifacts
+        run: |
+          test -f README.md
+          test -f .env.example
+          test -f .gitignore
+          test -f .dockerignore
+          test -f pyproject.toml
+
+      - name: Install application and test dependencies
+        run: pip install . pytest
+
+      - name: Run focused API tests
+        run: pytest

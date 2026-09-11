@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://bk-exp.example.org/ontology/tour-navigation#"
+     xml:base="https://bk-exp.example.org/ontology/tour-navigation"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+
+    <owl:Ontology rdf:about="https://bk-exp.example.org/ontology/tour-navigation">
+        <rdfs:comment>
+            Vocabulary for evidence-backed cultural tours, dynamic crossovers,
+            consented feedback, and resumable routes.
+        </rdfs:comment>
+    </owl:Ontology>
+
+    <owl:Class rdf:about="#CulturalFigure"/>
+    <owl:Class rdf:about="#PointOfInterest"/>
+    <owl:Class rdf:about="#EvidenceSource"/>
+    <owl:Class rdf:about="#CulturalConnection"/>
+    <owl:Class rdf:about="#Tour"/>
+    <owl:Class rdf:about="#Route"/>
+    <owl:Class rdf:about="#RouteStop"/>
+    <owl:Class rdf:about="#CrossoverOffer"/>
+    <owl:Class rdf:about="#Visitor"/>
+    <owl:Class rdf:about="#FeedbackEvent"/>
+    <owl:Class rdf:about="#PreferenceProfile"/>
+
+    <owl:ObjectProperty rdf:about="#featuresFigure">
+        <rdfs:domain rdf:resource="#Tour"/>
+        <rdfs:range rdf:resource="#CulturalFigure"/>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="#includesRoute">
+        <rdfs:domain rdf:resource="#Tour"/>
+        <rdfs:range rdf:resource="#Route"/>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="#hasStop">
+        <rdfs:domain rdf:resource="#Route"/>
+        <rdfs:range rdf:resource="#RouteStop"/>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="#atPointOfInterest">
+        <rdfs:domain rdf:resource="#RouteStop"/>
+        <rdfs:range rdf:resource="#PointOfInterest"/>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="#documentsConnection">
+        <rdfs:domain rdf:resource="#EvidenceSource"/>
+        <rdfs:range rdf:resource="#CulturalConnection"/>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="#connectsFigure">
+        <rdfs:domain rdf:resource="#CulturalConnection"/>
+        <rdfs:range rdf:resource="#CulturalFigure"/>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="#connectsPlace">
+        <rdfs:domain rdf:resource="#CulturalConnection"/>
+        <rdfs:range rdf:resource="#PointOfInterest"/>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="#offersRoute">
+        <rdfs:domain rdf:resource="#CrossoverOffer"/>
+        <rdfs:range rdf:resource="#Route"/>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="#preservesRoute">
+        <rdfs:domain rdf:resource="#CrossoverOffer"/>
+        <rdfs:range rdf:resource="#Route"/>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="#madeBy">
+        <rdfs:domain rdf:resource="#FeedbackEvent"/>
+        <rdfs:range rdf:resource="#Visitor"/>
+    </owl:ObjectProperty>
+    <owl:ObjectProperty rdf:about="#updatesProfile">
+        <rdfs:domain rdf:resource="#FeedbackEvent"/>
+        <rdfs:range rdf:resource="#PreferenceProfile"/>
+    </owl:ObjectProperty>
+
+    <owl:DatatypeProperty rdf:about="#sourceUrl">
+        <rdfs:domain rdf:resource="#EvidenceSource"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="#retrievedAt">
+        <rdfs:domain rdf:resource="#EvidenceSource"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="#confidence">
+        <rdfs:domain rdf:resource="#CulturalConnection"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="#latitude">
+        <rdfs:domain rdf:resource="#PointOfInterest"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="#longitude">
+        <rdfs:domain rdf:resource="#PointOfInterest"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="#addedMinutes">
+        <rdfs:domain rdf:resource="#CrossoverOffer"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="#addedCostUsd">
+        <rdfs:domain rdf:resource="#CrossoverOffer"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    </owl:DatatypeProperty>
+    <owl:DatatypeProperty rdf:about="#feedbackType">
+        <rdfs:domain rdf:resource="#FeedbackEvent"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+</rdf:RDF>

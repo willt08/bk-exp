@@ -1,0 +1,18 @@
+:root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; display: grid; grid-template-columns: 340px 1fr; min-height: 100vh; background: #101114; color: #f6f1e8; }
+aside { z-index: 1; padding: 2rem; background: #202126; overflow-y: auto; }
+main { min-height: 100vh; }
+h1 { font-size: 2.4rem; line-height: 1; margin: .25rem 0 1rem; }
+h2 { font-size: 1.1rem; margin-top: 2rem; }
+.eyebrow { color: #f0bf5f; font-weight: 800; letter-spacing: .15em; margin: 0; }
+#status { color: #cdd0d7; line-height: 1.5; }
+label { display: block; font-weight: 700; margin: 1.5rem 0 .4rem; }
+select, button { width: 100%; min-height: 2.8rem; border-radius: .4rem; padding: .6rem .8rem; font: inherit; }
+select { border: 1px solid #555965; background: #111217; color: inherit; }
+button { border: 0; margin-top: .75rem; background: #f0bf5f; color: #1d1b17; cursor: pointer; font-weight: 800; }
+button.secondary { background: transparent; border: 1px solid #767987; color: #f6f1e8; margin-top: .4rem; }
+.offer { border-top: 1px solid #424550; margin-top: 1rem; padding-top: 1rem; }
+.offer p { color: #cdd0d7; font-size: .9rem; line-height: 1.4; }
+.avatar { width: 48px; height: 48px; filter: drop-shadow(0 2px 5px #0008); }
+@media (max-width: 720px) { body { grid-template-columns: 1fr; grid-template-rows: auto 60vh; } aside { padding: 1.25rem; } main { min-height: 60vh; } }

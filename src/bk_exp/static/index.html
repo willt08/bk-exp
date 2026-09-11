@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BK-EXP | Adaptive Brooklyn tours</title>
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+    <link href="/static/styles.css" rel="stylesheet">
+  </head>
+  <body>
+    <aside>
+      <p class="eyebrow">BK-EXP</p>
+      <h1>Walk Brooklyn stories.</h1>
+      <p id="status" role="status">Choose a character to start a live route.</p>
+      <label for="character">Your tour character</label>
+      <select id="character">
+        <option value="basquiat">Jean-Michel Basquiat</option>
+        <option value="whitman">Walt Whitman</option>
+        <option value="biggie">The Notorious B.I.G.</option>
+        <option value="rbg">Ruth Bader Ginsburg</option>
+      </select>
+      <button id="start-tour">Start tour</button>
+      <section aria-labelledby="offers-heading">
+        <h2 id="offers-heading">Nearby crossovers</h2>
+        <div id="offers"><p>Location updates will surface fitting detours.</p></div>
+      </section>
+    </aside>
+    <main id="map" aria-label="Interactive Brooklyn tour map"></main>
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
